@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CredentialsBox = props => {
-    const { onSubmit, title, linkTitle, onLinkClick} = props;
+    const { onSubmit, title, linkTitle, linkRoute} = props;
     const classes = useStyles();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState(''); 
@@ -68,7 +68,7 @@ const CredentialsBox = props => {
             >
                 {title}
           </Button>
-          <Link variant="body2" href="#" onClick={onLinkClick}>
+          <Link variant="body2" href={linkRoute}>
               {linkTitle}
           </Link>
         </div>

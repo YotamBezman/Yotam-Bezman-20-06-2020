@@ -60,7 +60,10 @@ const TablePaginationActions = props => {
             >
                 {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
             </IconButton>
-            <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
+            <IconButton 
+                onClick={handleBackButtonClick} 
+                disabled={page === 0} 
+                aria-label="previous page">
                 {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
             </IconButton>
             <IconButton
@@ -99,7 +102,7 @@ const PaginatedTable = props => {
     return <TableContainer component={Paper}>
         <Table className={classes.table}>
             <TableHead>
-                <TableRow style={{ backgroundColor: "blue", color: "White" }}>
+                <TableRow>
                     {
                         headers.map(header => (
                             <TableCell key={header.name}>
@@ -114,7 +117,7 @@ const PaginatedTable = props => {
                     (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         : rows)
                         .map(row => (
-                            <TableRow key={row.message_id}>
+                            <TableRow key={row.messageId}>
                                 <TableCell component="th" scope="row">
                                     {row.subject}
                                 </TableCell>

@@ -1,30 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import CredentialsBox from '../components/credentialsBox.jsx';
-import Types from '../common/types.js';
 import URLS from '../common/urls.js';
-import { fetchJson } from '../common/api.js';
+import { useHistory } from 'react-router-dom';
+import useHttpRequest from '../hooks/useHttpRequest.js';
 
 
 const LoginBox = props => {
-    const { setToken, setDisplayedComponent } = props;
+    const { setToken } = props;
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const history = useHistory();
+
+    const data = useHttpRequest(URLS.LOGIN, "POST", JSON.stringify({
+        username: username,
+        password: password
+    }));
+
+    useEffect(async () => {
+        const content = await data.json();
+        setToken(data.token);
+        history.push("/mail");
+    });
 
     return <CredentialsBox
         onSubmit={(username, password) => {
-            fetchJson(URLS.LOGIN, "POST",
-                JSON.stringify({
-                    username: username,
-                    password: password
-                })
-            )
-                .then(res => res.json())
-                .then(data => {
-                    setToken(data.token)
-                    setDisplayedComponent(Types.MAILBOX)
-                })
+            setUsername(username);
+            setPassword(password);
         }}
         title="Login"
         linkTitle="Don't have an account yet? Sign up here"
-        onLinkClick={() => setDisplayedComponent(Types.SIGN_UP)}
+        linkRoute="/signup"
     />
 }
 
