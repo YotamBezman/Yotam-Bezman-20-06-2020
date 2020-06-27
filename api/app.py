@@ -1,14 +1,13 @@
 import uuid
 from datetime import datetime, timedelta
 from functools import wraps
-from gevent.pywsgi import WSGIServer
 
 import jwt
+from dal import SqliteDal
 from flask import Flask, jsonify, request, make_response, send_from_directory
 from flask_cors import CORS
+from gevent.pywsgi import WSGIServer
 from werkzeug.security import generate_password_hash, check_password_hash
-
-from dal import SqliteDal
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = str(uuid.uuid4())
