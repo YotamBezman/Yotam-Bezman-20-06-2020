@@ -46,6 +46,7 @@ const useStyles = makeStyles(theme => ({
 const MailBox = props => {
     const { token, setToken, removeCookie, username } = props;
     const [wasSent, setWasSent] = useState(false);
+    const [wasDeleted, setWasDeleted] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
     const [sentMessages, setSentMessages] = useState([]);
     const [receivedMessages, setReceivedMessages] = useState([]);
@@ -140,6 +141,15 @@ const MailBox = props => {
                     Sent Successfully!
             </Alert>
         }
+
+        if (wasDeleted == true) {
+            return <Alert
+                onClose={() => setWasDeleted(false)}
+                variant="filled"
+                >
+                    Deleted Successfully!
+            </Alert>
+        }
     }
 
     return token === null ? <Redirect to="/login" /> :
@@ -225,7 +235,8 @@ const MailBox = props => {
                     endIcon={<DeleteIcon />}
                     onClick={async () => {
                         await deleteMessages();
-                        getMessages();
+                        await getMessages();
+                        setWasDeleted(true);
                     }}
                 >
                     Delete
