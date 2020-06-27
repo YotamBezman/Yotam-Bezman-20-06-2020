@@ -1,36 +1,58 @@
-import React, { useState, useEffect} from 'react';
+import React, {useState} from 'react';
+import Alert from '@material-ui/lab/Alert';
 import CredentialsBox from '../components/credentialsBox.jsx';
 import URLS from '../common/urls.js';
 import { useHistory } from 'react-router-dom';
-import useHttpRequest from '../hooks/useHttpRequest.js';
+import { fetchJson } from '../common/api.js';
+import MailBar from './mailBar.jsx';
 
 
 const LoginBox = props => {
-    const { setToken } = props;
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const { setToken, setUsername, setCookie } = props;
+    const [errorMessage, setErrorMessage] = useState(null);
     const history = useHistory();
 
-    const data = useHttpRequest(URLS.LOGIN, "POST", JSON.stringify({
-        username: username,
-        password: password
-    }));
+    const loginToServer = async (username, password) => {
+        try {
+            const response = await fetchJson(URLS.LOGIN, "POST", JSON.stringify({
+                username: username,
+                password: password
+            }));
 
-    useEffect(async () => {
-        const content = await data.json();
-        setToken(data.token);
-        history.push("/mail");
-    });
+            const body = await response.json();
 
-    return <CredentialsBox
-        onSubmit={(username, password) => {
+            setToken(body.token);
             setUsername(username);
-            setPassword(password);
-        }}
-        title="Login"
-        linkTitle="Don't have an account yet? Sign up here"
-        linkRoute="/signup"
-    />
+            setCookie('token', body.token)
+            setCookie('username', username);
+            history.push("/mail");
+        }
+        catch (e) {
+            setErrorMessage('Invalid Credentials!');
+        }
+    }
+
+    const getAlert = () => {
+        return errorMessage != null ? 
+            <Alert
+                severity='error'
+                variant="filled"
+                onClose={() => setErrorMessage(null)}
+            >
+                {String(errorMessage)}
+            </Alert> : null;
+    }
+
+    return <div>
+        <MailBar title="Welcome!"></MailBar>
+        {getAlert()}
+        <CredentialsBox
+            onSubmit={loginToServer}
+            title="Login"
+            linkTitle="Don't have an account yet? Sign up here"
+            linkRoute="/"
+        />
+    </div>;
 }
 
 export default LoginBox;

@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import uuid
+from datetime import datetime
 
 
 class SqliteDal:
@@ -16,6 +17,7 @@ class SqliteDal:
             self.__connection.execute("CREATE TABLE Messages(id text primary key, content text, subject text,"
                                       " sender_id text,"
                                       " receiver_id text,"
+                                      " creation_date text,"
                                       " foreign key(sender_id) references Users(id), "
                                       " foreign key(receiver_id) references Users(id))")
 
@@ -31,12 +33,28 @@ class SqliteDal:
                 yield dict(zip(result.keys(), result))
 
     def get_sent_messages(self, sender_id: str):
-        return self.__query(f"SELECT m.id as id, content, subject, receiver_id FROM Messages m "
-                            f"JOIN Users u ON m.sender_id == '{sender_id}'")
+        results = self.__query(f"SELECT m.id as id, content, subject, receiver_id, creation_date as date FROM Messages m "
+                               f"JOIN Users u ON m.sender_id == '{sender_id}' AND"
+                               f" m.sender_id == u.id")
+
+        for result in results:
+            user = self.get_user_by_id(result["receiver_id"])
+            yield {
+                **result,
+                "to": user["username"]
+            }
 
     def get_received_messages(self, receiver_id: str):
-        return self.__query(f"SELECT m.id as id, content, subject, sender_id FROM Messages m "
-                            f"JOIN Users u ON m.receiver_id == '{receiver_id}'")
+        results = self.__query(f"SELECT m.id as id, content, subject, sender_id, creation_date as date FROM Messages m "
+                               f"JOIN Users u ON m.receiver_id == '{receiver_id}' AND"
+                               f" m.receiver_id == u.id")
+
+        for result in results:
+            user = self.get_user_by_id(result["sender_id"])
+            yield {
+                **result,
+                "from": user["username"]
+            }
 
     def get_user(self, username: str):
         results = list(self.__query(f"SELECT * FROM Users WHERE Users.username == '{username}'"))
@@ -57,10 +75,10 @@ class SqliteDal:
 
     def add_message(self, sender_id, receiver_id, content, subject):
         with self.__get_connection() as connection:
-            connection.execute(f"INSERT INTO Messages(id, content, subject, sender_id, receiver_id)"
-                               f"VALUES('{uuid.uuid4()}', '{content}', '{subject}', '{sender_id}', '{receiver_id}')")
+            connection.execute(f"INSERT INTO Messages(id, content, subject, sender_id, receiver_id, creation_date)"
+                               f"VALUES('{uuid.uuid4()}', '{content}', '{subject}', '{sender_id}', '{receiver_id}', "
+                               f"'{datetime.now()}')")
 
-    def delete_message(self, message_id, sender_id):
+    def delete_message(self, message_id):
         with self.__get_connection() as connection:
-            connection.execute(f"DELETE FROM Messages WHERE Messages.id == '{message_id}' AND"
-                               f"Messages.sender_id == '{sender_id}'")
+            connection.execute(f"DELETE FROM Messages WHERE Messages.id == '{message_id}'")

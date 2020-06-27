@@ -6,10 +6,11 @@ import Typography from '@material-ui/core/Typography';
 
 const MailBar = props => {
     return <AppBar position="static">
-        <ToolBar>
+        <ToolBar style={{display: 'flex', justifyContent: "space-between"}}>
             <Typography variant="h4" color="inherit">
                 {props.title}
             </Typography>
+            {props.children}
         </ToolBar>
     </AppBar>
 }

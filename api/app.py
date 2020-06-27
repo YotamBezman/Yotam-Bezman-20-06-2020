@@ -41,17 +41,11 @@ def token_required(func):
                 if user:
                     return func(user, *args, **kwargs)
 
-                return jsonify({
-                    "message": "Token is invalid!"
-                })
-            except:
-                return jsonify({
-                    "message": "Token is invalid!"
-                })
+                return make_response("Token is invalid!", 401)
+            except Exception as e:
+                return make_response("Token is invalid!", 401)
 
-        return jsonify({
-            "message": "Token is missing!"
-        })
+        return make_response("Token is missing", 401)
 
     return decorated
 
@@ -83,9 +77,7 @@ def write_message(current_user, data):
             "Message": "Success!"
         })
 
-    return jsonify({
-        "Message": "Invalid sender or receiver!"
-    })
+    return make_response("Invalid sender or receiver!", 401)
 
 
 @app.route("/delete-message", methods=["DELETE"])
@@ -93,15 +85,13 @@ def write_message(current_user, data):
 @token_required
 def delete_message(current_user, data):
     if "message_id" in data:
-        dal.delete_message(data["message_id"], current_user["id"])
+        dal.delete_message(data["message_id"])
 
         return jsonify({
             "Message": "Success"
         })
 
-    return jsonify({
-        "Message": "Missing Message ID!"
-    })
+    return make_response("Missing Message ID!", 401)
 
 
 @app.route("/signup", methods=["POST"])
@@ -126,7 +116,6 @@ def login(creds):
     user = dal.get_user(creds["username"])
 
     if not user or not check_password_hash(user["password"], creds["password"]):
-        print(creds)
         return make_response("Verification Failed!", 401)
 
     token = jwt.encode({

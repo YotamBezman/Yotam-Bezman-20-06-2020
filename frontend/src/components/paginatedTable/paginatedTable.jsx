@@ -7,89 +7,27 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import TableHead from '@material-ui/core/TableHead';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
+import Checkbox from '@material-ui/core/Checkbox';
+import TablePaginationActions from './tablePaginationActions.jsx';
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     table: {
-        minWidth: 500,
-    }
-});
-
-const useStylesForPaginationActions = makeStyles(theme => ({
-    root: {
-        flexShrink: 0,
-        marginLeft: theme.spacing(2.5),
+        minWidth: 500
     },
+    tableHead: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    }
 }));
-
-
-const TablePaginationActions = props => {
-    const classes = useStylesForPaginationActions();
-    const theme = useTheme();
-    const { count, page, rowsPerPage, onChangePage } = props;
-
-    const handleFirstPageButtonClick = e => {
-        onChangePage(e, 0);
-    };
-
-    const handleBackButtonClick = e => {
-        onChangePage(e, page - 1);
-    };
-
-    const handleNextButtonClick = e => {
-        onChangePage(e, page + 1);
-    };
-
-    const handleLastPageButtonClick = e => {
-        onChangePage(e, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-    };
-
-    return (
-        <div className={classes.root}>
-            <IconButton
-                onClick={handleFirstPageButtonClick}
-                disabled={page === 0}
-                aria-label="first page"
-            >
-                {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-            </IconButton>
-            <IconButton 
-                onClick={handleBackButtonClick} 
-                disabled={page === 0} 
-                aria-label="previous page">
-                {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-            </IconButton>
-            <IconButton
-                onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                aria-label="next page"
-            >
-                {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-            </IconButton>
-            <IconButton
-                onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                aria-label="last page"
-            >
-                {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-            </IconButton>
-        </div>
-    );
-}
 
 
 const PaginatedTable = props => {
     const classes = useStyles();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const { rows, headers } = props;
+    const { rows, headers, onCheckBoxChange, onRowClick } = props;
     const handleChangePage = (e, newPage) => {
         setPage(newPage);
     };
@@ -99,14 +37,17 @@ const PaginatedTable = props => {
         setPage(0);
     };
 
-    return <TableContainer component={Paper}>
+    return <TableContainer>
         <Table className={classes.table}>
             <TableHead>
                 <TableRow>
+                    <TableCell className={classes.tableHead}>
+                        Mark
+                    </TableCell>
                     {
-                        headers.map(header => (
-                            <TableCell key={header.name}>
-                                {header.name}
+                        headers.map((header, i) => (
+                            <TableCell key={i} className={classes.tableHead}>
+                                {header}
                             </TableCell>
                         ))
                     }
@@ -116,14 +57,24 @@ const PaginatedTable = props => {
                 {
                     (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         : rows)
-                        .map(row => (
-                            <TableRow key={row.messageId}>
-                                <TableCell component="th" scope="row">
-                                    {row.subject}
+                        .map((row, i) => (
+                            <TableRow key={row.id}>
+                                <TableCell padding='checkbox'>
+                                    <Checkbox
+                                        color="primary"
+                                        onChange={e => onCheckBoxChange(e.target.checked, row)}
+                                    />
                                 </TableCell>
-                                <TableCell component="th" scope="row">
-                                    {row.sender}
-                                </TableCell>
+                                {
+                                    headers.map((header, i) => {
+                                        return <TableCell
+                                            key={i}
+                                            onClick={() => onRowClick(row)}
+                                        >
+                                            {row[header]}
+                                        </TableCell>
+                                    })
+                                }
                             </TableRow>
                         ))
                 }
@@ -133,7 +84,7 @@ const PaginatedTable = props => {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                         colSpan={headers.length}
-                        count={rows.length}
+                        count={rows === undefined ? 0 : rows.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         SelectProps={{

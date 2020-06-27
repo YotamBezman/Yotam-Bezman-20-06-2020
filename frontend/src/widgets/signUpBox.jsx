@@ -1,33 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState} from 'react';
 import CredentialsBox from '../components/credentialsBox.jsx';
 import URLS from '../common/urls.js';
 import { useHistory } from 'react-router-dom';
-import useHttpRequest from '../hooks/useHttpRequest.js';
+import { fetchJson } from '../common/api.js';
+import MailBar from './mailBar.jsx';
 
 
 const SignUpBox = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const history = useHistory();
+    const [errorMessage, setErrorMessage] = useState(null);
 
-    useHttpRequest(URLS.SIGNUP, "POST", JSON.stringify({
-        username: username,
-        password: password
-    }));
+    const signUpToServer = async (username, password) => {
+        try {
+            const response = await fetchJson(URLS.SIGNUP, "POST", JSON.stringify({
+                username: username,
+                password: password
+            }));
 
-    useEffect(() => {
-        history.push("/login");
-    });
+            if (!response.ok) {
+                throw new Error("Failed to signup!");
+            }
 
-    return <CredentialsBox
-        onSubmit={(username, password) => {
-            setUsername(username);
-            setPassword(password);
-        }}
-        title="Sign Up"
-        linkTitle="Already have an account? Login"
-        linkRoute="/login"
-    />
+            history.push("/login");
+        }
+        catch (e) {
+            setErrorMessage(e);
+        }
+    }
+
+    const getAlert = () => {
+        return errorMessage != null ? 
+            <Alert
+                severity='error'
+                variant="filled"
+                onClose={() => setErrorMessage(null)}
+            >
+                {String(errorMessage)}
+            </Alert> : null;
+    }
+
+    return <div>
+        <MailBar title="Welcome!"></MailBar>
+        {getAlert()}
+        <CredentialsBox
+            onSubmit={signUpToServer}
+            title="Sign Up"
+            linkTitle="Already have an account? Login"
+            linkRoute="/login"
+        />
+    </div>
 }
 
 export default SignUpBox;
