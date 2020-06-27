@@ -14,8 +14,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Alert from '@material-ui/lab/Alert';
 import { fetchJson } from '../common/api.js';
 import URLS from '../common/urls.js';
-import NewEmailBox from '../components/newEmailBox.jsx';
-import EmailContentBox from '../components/emailContentBox.jsx';
+import NewEmailBox from './newEmailBox.jsx';
+import EmailContentBox from './emailContentBox.jsx';
 
 
 const useStyles = makeStyles(theme => ({

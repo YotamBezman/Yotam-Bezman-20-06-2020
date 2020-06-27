@@ -31,6 +31,10 @@ const NewEmailBox = props => {
 
     const sendMessage = async () => {
         try {
+            if (!receiver || !body || !subject) {
+                throw new Error("Please fill all the required fields!");
+            }
+
             const response = await fetchJson(URLS.WRITE_MESSAGE, "POST", JSON.stringify({
                 sender: username,
                 receiver: receiver,
