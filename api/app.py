@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime, timedelta
 from functools import wraps
+from gevent.pywsgi import WSGIServer
 
 import jwt
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, send_from_directory
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -48,6 +49,16 @@ def token_required(func):
         return make_response("Token is missing", 401)
 
     return decorated
+
+
+@app.route("/")
+def get_index():
+    return send_from_directory("", 'assets/index.html')
+
+
+@app.route("/<path:path>", methods=["GET"])
+def get_index_script(path):
+    return send_from_directory("", f"assets/{path}")
 
 
 @app.route("/get-messages", methods=["GET"])
@@ -129,7 +140,8 @@ def login(creds):
 
 
 def main():
-    app.run()
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
 
 
 if __name__ == "__main__":

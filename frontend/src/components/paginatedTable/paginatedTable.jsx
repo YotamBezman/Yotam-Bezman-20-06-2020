@@ -83,8 +83,8 @@ const PaginatedTable = props => {
                 <TableRow>
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                        colSpan={headers.length}
-                        count={rows === undefined ? 0 : rows.length}
+                        colSpan={headers.length + 1}
+                        count={rows.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         SelectProps={{
