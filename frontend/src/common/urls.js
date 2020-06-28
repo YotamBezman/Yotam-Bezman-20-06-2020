@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000"
+const BASE_URL = "http://3.128.131.132"
 
 const URLS = {
     SIGNUP: BASE_URL + "/signup",
