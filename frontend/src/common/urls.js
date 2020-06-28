@@ -1,4 +1,4 @@
-const BASE_URL = "http://3.128.131.132"
+const BASE_URL = "http://3.136.108.16"
 
 const URLS = {
     SIGNUP: BASE_URL + "/signup",
