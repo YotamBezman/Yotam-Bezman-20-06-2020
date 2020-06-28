@@ -1,4 +1,3 @@
-jwt
+pwjwt
 flask
 flask-cors
-gevent
