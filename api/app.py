@@ -138,7 +138,7 @@ def login(creds):
 
 
 def main():
-    app.run(port=80)
+    app.run(host="0.0.0.0", port=80)
 
 
 if __name__ == "__main__":
