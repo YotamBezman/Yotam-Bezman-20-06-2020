@@ -6,7 +6,6 @@ import jwt
 from dal import SqliteDal
 from flask import Flask, jsonify, request, make_response, send_from_directory
 from flask_cors import CORS
-from gevent.pywsgi import WSGIServer
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -139,8 +138,7 @@ def login(creds):
 
 
 def main():
-    http_server = WSGIServer(('', 5000), app)
-    http_server.serve_forever()
+    app.run(port=80)
 
 
 if __name__ == "__main__":
