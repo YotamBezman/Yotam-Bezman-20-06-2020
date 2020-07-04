@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -9,7 +10,7 @@ import SendIcon from '@material-ui/icons/Send';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { makeStyles } from '@material-ui/core/styles';
 import URLS from '../common/urls.js';
-import {fetchJson} from '../common/api.js';
+import { fetchJson } from '../common/api.js';
 
 
 const useStyles = makeStyles(theme => ({
@@ -23,11 +24,13 @@ const useStyles = makeStyles(theme => ({
 
 
 const NewEmailBox = props => {
-    const { isOpen, setIsOpen, onClose, username, token, setErrorMessage, setWasSent } = props;
+    const { isOpen, setIsOpen, onClose, setErrorMessage, setWasSent } = props;
     const [receiver, setReceiver] = useState('');
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
     const classes = useStyles();
+    const username = useSelector(state => state.username);
+    const token = useSelector(state => state.token);
 
     const sendMessage = async () => {
         try {
@@ -36,19 +39,22 @@ const NewEmailBox = props => {
             }
 
             const response = await fetchJson(URLS.WRITE_MESSAGE, "POST", JSON.stringify({
-                sender: username,
+                sender: username.username,
                 receiver: receiver,
                 content: body,
                 subject: subject
             }),
-            {
-                "x-access-token": token
-            });
-            
+                {
+                    "x-access-token": token.token
+                });
+
             if (!response.ok) {
                 throw new Error("Failed to send the message!");
             }
-
+            
+            setSubject('');
+            setReceiver('');
+            setBody('');
             setIsOpen(false);
             setWasSent(true);
         }

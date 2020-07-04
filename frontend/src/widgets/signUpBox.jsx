@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import CredentialsBox from '../components/credentialsBox.jsx';
 import URLS from '../common/urls.js';
 import { useHistory } from 'react-router-dom';
 import { fetchJson } from '../common/api.js';
 import MailBar from './mailBar.jsx';
+import Alert from '@material-ui/lab/Alert';
 
 
 const SignUpBox = () => {
@@ -29,7 +30,7 @@ const SignUpBox = () => {
     }
 
     const getAlert = () => {
-        return errorMessage != null ? 
+        return errorMessage != null ?
             <Alert
                 severity='error'
                 variant="filled"

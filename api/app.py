@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 
 import jwt
+import sqlite3
 from dal import SqliteDal
 from flask import Flask, jsonify, request, make_response, send_from_directory
 from flask_cors import CORS
@@ -68,6 +69,7 @@ def get_messages(current_user):
     })
 
 
+
 @app.route("/write-message", methods=["POST"])
 @data_required
 @token_required
@@ -109,7 +111,10 @@ def signup(user):
     if not user["username"] or not user["password"]:
         return make_response("Missing parameters", 403)
 
-    dal.add_user(user["username"], generate_password_hash(user["password"]))
+    try:
+        dal.add_user(user["username"], generate_password_hash(user["password"]))
+    except sqlite3.IntegrityError:
+        return make_response("Username is occupied", 403)
 
     return jsonify({
         "Message": "Success!"
