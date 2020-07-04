@@ -1,4 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setUsername, setToken } from '../redux/index.js';
 import Alert from '@material-ui/lab/Alert';
 import CredentialsBox from '../components/credentialsBox.jsx';
 import URLS from '../common/urls.js';
@@ -8,9 +10,10 @@ import MailBar from './mailBar.jsx';
 
 
 const LoginBox = props => {
-    const { setToken, setUsername, setCookie } = props;
+    const { setCookie } = props;
     const [errorMessage, setErrorMessage] = useState(null);
     const history = useHistory();
+    const dispatch = useDispatch();
 
     const loginToServer = async (username, password) => {
         try {
@@ -21,8 +24,8 @@ const LoginBox = props => {
 
             const body = await response.json();
 
-            setToken(body.token);
-            setUsername(username);
+            dispatch(setToken(body.token));
+            dispatch(setUsername(username));
             setCookie('token', body.token)
             setCookie('username', username);
             history.push("/mail");
@@ -33,7 +36,7 @@ const LoginBox = props => {
     }
 
     const getAlert = () => {
-        return errorMessage != null ? 
+        return errorMessage != null ?
             <Alert
                 severity='error'
                 variant="filled"

@@ -13,7 +13,7 @@ class SqliteDal:
         self.__connection = sqlite3.connect(uri)
 
         with self.__connection:
-            self.__connection.execute("CREATE TABLE Users(id text primary key, username text, password text)")
+            self.__connection.execute("CREATE TABLE Users(id text primary key, username text unique, password text)")
             self.__connection.execute("CREATE TABLE Messages(id text primary key, content text, subject text,"
                                       " sender_id text,"
                                       " receiver_id text,"
@@ -33,7 +33,8 @@ class SqliteDal:
                 yield dict(zip(result.keys(), result))
 
     def get_sent_messages(self, sender_id: str):
-        results = self.__query(f"SELECT m.id as id, content, subject, receiver_id, creation_date as date FROM Messages m "
+        results = self.__query(f"SELECT m.id as id, content, subject, receiver_id, creation_date as date "
+                               f"FROM Messages m "
                                f"JOIN Users u ON m.sender_id == '{sender_id}' AND"
                                f" m.sender_id == u.id")
 

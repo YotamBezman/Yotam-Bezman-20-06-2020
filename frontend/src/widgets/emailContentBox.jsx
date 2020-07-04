@@ -3,7 +3,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
-import {makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
     dialog: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const EmailContentBox = props => {
-    const {subject, content, isSent, associatedUser, isOpen, setIsOpen} = props;
+    const { subject, content, isSent, associatedUser, isOpen, setIsOpen } = props;
     const classes = useStyles();
 
     return <Dialog
@@ -43,7 +43,7 @@ const EmailContentBox = props => {
                 margin="dense"
                 fullWidth
             />
-            <TextField 
+            <TextField
                 variant='outlined'
                 value={`${isSent ? 'To' : 'From'}: ${associatedUser}`}
                 fullWidth

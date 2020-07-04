@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setToken } from '../redux/index.js';
 import PaginatedTable from '../components/paginatedTable/paginatedTable.jsx';
 import MailBar from './mailBar.jsx';
 import { Redirect, useHistory } from 'react-router-dom';
@@ -44,7 +46,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const MailBox = props => {
-    const { token, setToken, removeCookie, username } = props;
+    const { removeCookie } = props;
     const [wasSent, setWasSent] = useState(false);
     const [wasDeleted, setWasDeleted] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -57,6 +59,10 @@ const MailBox = props => {
     const [currentDisplay, setCurrentDisplay] = useState(0);
     const classes = useStyles();
     const history = useHistory();
+
+    const dispatch = useDispatch();
+    const username = useSelector(state => state.username);
+    const token = useSelector(state => state.token).token;
 
     const getMessages = async () => {
         if (token != null) {
@@ -83,7 +89,7 @@ const MailBox = props => {
     }, [token, wasSent]);
 
     const logout = () => {
-        setToken(null);
+        dispatch(setToken(null));
         removeCookie('token');
         removeCookie('username');
         history.push("/login");
@@ -102,7 +108,6 @@ const MailBox = props => {
     }
 
     const deleteMessages = () => {
-        const currentMessages = currentDisplay == 0 ? receivedMessages : sentMessages;
         const pendingMessages = []
 
         markedForDelete.forEach(id => {
@@ -137,8 +142,8 @@ const MailBox = props => {
             return <Alert
                 onClose={() => setWasSent(false)}
                 variant="filled"
-                >
-                    Sent Successfully!
+            >
+                Sent Successfully!
             </Alert>
         }
 
@@ -146,8 +151,8 @@ const MailBox = props => {
             return <Alert
                 onClose={() => setWasDeleted(false)}
                 variant="filled"
-                >
-                    Deleted Successfully!
+            >
+                Deleted Successfully!
             </Alert>
         }
     }
@@ -159,8 +164,6 @@ const MailBox = props => {
                 isOpen={isNewEmailBoxOpen}
                 setIsOpen={setIsNewEmailBoxOpen}
                 onClose={() => setIsNewEmailBoxOpen(false)}
-                username={username}
-                token={token}
                 setErrorMessage={setErrorMessage}
                 setWasSent={setWasSent}
             />
@@ -173,7 +176,7 @@ const MailBox = props => {
                 content={clickedRow.content}
             />
             <div className={classes.bar}>
-                <MailBar title={`Welcome, ${username}!`}>
+                <MailBar title={`Welcome, ${username.username}!`}>
                     <Button
                         variant="contained"
                         endIcon={<ExitToAppIcon />}
